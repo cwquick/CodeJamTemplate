@@ -57,23 +57,52 @@ namespace Code_Jam___Base
 
             using (StreamReader reader = new StreamReader(input))
             {
-                
-                // Submission B - Small
-                currentLine = reader.ReadLine();
-                currentLine = reader.ReadLine(); // Move past # of cases
+                // Char positions [ messy, messy....]
+                char[,] keys = new char[9,4] {
+                                                { 'a', 'b', 'c', '~' },
+                                                { 'd', 'e', 'f', '~' },
+                                                { 'g', 'h', 'i', '~' },
+                                                { 'j', 'k', 'l', '~' },
+                                                { 'm', 'n', 'o', '~' },
+                                                { 'p', 'q', 'r', 's' },
+                                                { 't', 'u', 'v', '~' },
+                                                { 'w', 'x', 'y', 'z' },
+                                                { ' ', '~', '~', '~' }
+                                             };
+
+                char[] msgRequest;
                 string output = string.Empty;
                 int caseNo = 1;
-                IEnumerable<string> backwardsWords;
+                int lastKey = -1;
+
+                // Submission C
+                currentLine = reader.ReadLine();
+                currentLine = reader.ReadLine(); // Move past # of cases
+
 
                 //TODO: Possibly use WHILE instead of IF?
                 while (currentLine != null)
                 {
+                    msgRequest = currentLine.ToCharArray();
                     output = "Case #" + caseNo++ + ": ";
 
-                    backwardsWords = currentLine.Split(' ').Reverse();
-                    foreach (string word in backwardsWords)
+                    foreach (char character in msgRequest)
                     {
-                        output += word + ' ';
+                        if (character == ' ')
+                            output += '0';
+                        else
+                            for (int i = 0; i < keys.GetLength(0); i++)
+                                for (int j = 0; j < keys.GetLength(1); j++)
+                                    if (keys[i, j] == character)
+                                    {
+                                        if (i * j == keys.Length || i == lastKey)
+                                            output += ' '; // last index of 0 or same as the last key entered, so put ' '
+
+                                        for (int k = 0; k <= j; k++)
+                                            output += i + 2; // +2 so 0 based array lines up with first key
+
+                                        lastKey = i;
+                                    }
                     }
 
                     stringBuilder.AppendLine(output);
