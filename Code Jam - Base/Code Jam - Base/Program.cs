@@ -57,52 +57,44 @@ namespace Code_Jam___Base
 
             using (StreamReader reader = new StreamReader(input))
             {
-                // Char positions [ messy, messy....]
-                char[,] keys = new char[9,4] {
-                                                { 'a', 'b', 'c', '~' },
-                                                { 'd', 'e', 'f', '~' },
-                                                { 'g', 'h', 'i', '~' },
-                                                { 'j', 'k', 'l', '~' },
-                                                { 'm', 'n', 'o', '~' },
-                                                { 'p', 'q', 'r', 's' },
-                                                { 't', 'u', 'v', '~' },
-                                                { 'w', 'x', 'y', 'z' },
-                                                { ' ', '~', '~', '~' }
-                                             };
-
-                char[] msgRequest;
                 string output = string.Empty;
                 int caseNo = 1;
-                int lastKey = -1;
+                int credit, itemCount = 0, item1, item2;
+                int[] prices = null, sortedprices = null;
 
                 // Submission C
                 currentLine = reader.ReadLine();
-                currentLine = reader.ReadLine(); // Move past # of cases
-
+                currentLine = reader.ReadLine();    // move past # of cases
 
                 //TODO: Possibly use WHILE instead of IF?
                 while (currentLine != null)
                 {
-                    msgRequest = currentLine.ToCharArray();
+                    credit = int.Parse(currentLine);
+                    itemCount = int.Parse(reader.ReadLine());
+                    prices = Array.ConvertAll<string, int>(reader.ReadLine().Split(' '), int.Parse);
+
+                    sortedprices = new int[prices.Length];
+                    prices.CopyTo(sortedprices, 0);
+                    Array.Sort(sortedprices);
+
                     output = "Case #" + caseNo++ + ": ";
 
-                    foreach (char character in msgRequest)
+                    // Find the two items that take up the entire credit
+                    for (item1 = 0; item1 < itemCount; item1++ )
                     {
-                        if (character == ' ')
-                            output += '0';
-                        else
-                            for (int i = 0; i < keys.GetLength(0); i++)
-                                for (int j = 0; j < keys.GetLength(1); j++)
-                                    if (keys[i, j] == character)
-                                    {
-                                        if (i * j == keys.Length || i == lastKey)
-                                            output += ' '; // last index of 0 or same as the last key entered, so put ' '
+                        item2 = Array.BinarySearch(sortedprices, (credit - sortedprices[item1]));
+                        if (item2 >= 0)
+                        {
+                            item1 = Array.IndexOf(prices, sortedprices[item1]) + 1;
+                            item2 = Array.IndexOf(prices, sortedprices[item2]) + 1;
 
-                                        for (int k = 0; k <= j; k++)
-                                            output += i + 2; // +2 so 0 based array lines up with first key
+                            // ugly fix for item1 index == item2 index
+                            if (item1 == item2)
+                                item2++;
 
-                                        lastKey = i;
-                                    }
+                            output += Math.Min(item1, item2).ToString() + ' ' + Math.Max(item1, item2).ToString();
+                            break;
+                        }
                     }
 
                     stringBuilder.AppendLine(output);
