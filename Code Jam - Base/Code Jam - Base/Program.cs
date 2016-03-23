@@ -52,13 +52,102 @@ namespace Code_Jam___Base
         /// <returns>A string containing the output from processing the file</returns>
         private static string ProcessFile(string input)
         {
+            return ProcessCodeJamQuestionA(input);
+            //return ProcessCodeJamQuestionB(input);
+            //return ProcessCodeJamQuestionC(input);            
+        }
+
+        private static string ProcessCodeJamQuestionA(string input)
+        {
             string currentLine;
+            string output = string.Empty;
+            int caseNo = 1;
+            int credit, itemCount = 0, item1, item2;
+            int[] prices = null, sortedprices = null;
             StringBuilder stringBuilder = new StringBuilder();
 
             using (StreamReader reader = new StreamReader(input))
             {
-                // Char positions [ messy, messy....]
-                Dictionary<char, int> keys = new Dictionary<char, int>()
+                currentLine = reader.ReadLine();
+                currentLine = reader.ReadLine();    // move past # of cases
+
+                while (currentLine != null)
+                {
+                    credit = int.Parse(currentLine);
+                    itemCount = int.Parse(reader.ReadLine());
+                    prices = Array.ConvertAll<string, int>(reader.ReadLine().Split(' '), int.Parse);
+
+                    sortedprices = new int[prices.Length];
+                    prices.CopyTo(sortedprices, 0);
+                    Array.Sort(sortedprices);
+
+                    output = "Case #" + caseNo++ + ": ";
+
+                    // Find the two items that together cost the entire credit value
+                    for (item1 = 0; item1 < itemCount; item1++)
+                    {
+                        item2 = Array.BinarySearch(sortedprices, (credit - sortedprices[item1]));
+                        if (item2 >= 0)
+                        {
+                            item1 = Array.IndexOf(prices, sortedprices[item1]) + 1;
+                            item2 = Array.IndexOf(prices, sortedprices[item2]) + 1;
+
+                            // ugly fix for item1 index == item2 index
+                            if (item1 == item2)
+                                item2++;
+
+                            output += Math.Min(item1, item2).ToString() + ' ' + Math.Max(item1, item2).ToString();
+                            break;
+                        }
+                    }
+
+                    stringBuilder.AppendLine(output);
+                    currentLine = reader.ReadLine();
+                }
+
+                reader.Close();
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
+        private static string ProcessCodeJamQuestionB(string input)
+        {
+            string currentLine;
+            string output = string.Empty;
+            int caseNo = 1;
+            IEnumerable<string> backwardsWords;
+            StringBuilder stringBuilder = new StringBuilder();
+
+            using (StreamReader reader = new StreamReader(input))
+            {
+                currentLine = reader.ReadLine();
+                currentLine = reader.ReadLine(); // Move past # of cases
+
+                while (currentLine != null)
+                {
+                    output = "Case #" + caseNo++ + ": ";
+
+                    backwardsWords = currentLine.Split(' ').Reverse();
+                    foreach (string word in backwardsWords)
+                        output += word + ' ';
+
+                    stringBuilder.AppendLine(output);
+                    currentLine = reader.ReadLine();
+                }
+
+                reader.Close();
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
+        private static string ProcessCodeJamQuestionC(string input)
+        {
+            string currentLine;
+            Dictionary<char, int> keys = new Dictionary<char, int>()
                 {
                     {'a', 2}, {'b', 22}, {'c', 222},
                     {'d', 3}, {'e', 33}, {'f', 333},
@@ -71,12 +160,14 @@ namespace Code_Jam___Base
                     {' ', 0}
                 };
 
-                char[] msgRequest;
-                string output = string.Empty;
-                int caseNo = 1;
-                int keyPress, lastKeyPress = -1;
+            char[] msgRequest;
+            string output = string.Empty;
+            int caseNo = 1;
+            int keyPress, lastKeyPress = -1;
+            StringBuilder stringBuilder = new StringBuilder();
 
-                // Submission C
+            using (StreamReader reader = new StreamReader(input))
+            {
                 currentLine = reader.ReadLine();
                 currentLine = reader.ReadLine(); // Move past # of cases
 
@@ -91,7 +182,7 @@ namespace Code_Jam___Base
 
                         if (keyPress.ToString()[0] == lastKeyPress.ToString()[0])
                             output += ' ';
-                        
+
                         output += keyPress;
                         lastKeyPress = keyPress;
                     }
